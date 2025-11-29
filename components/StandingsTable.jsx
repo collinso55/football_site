@@ -2,6 +2,7 @@
 'use client';
 
 import TeamLogo from './TeamLogo';
+import Link from 'next/link';
 
 export default function StandingsTable({ standings, recentMatches }) {
   if (!standings || standings.length === 0) {
@@ -44,7 +45,10 @@ export default function StandingsTable({ standings, recentMatches }) {
     <tr className="border-b hover:bg-gray-50 transition-colors">
       <td className="p-2 font-bold text-gray-900 text-xs">{position}</td>
       <td className="p-2">
-        <div className="flex items-center space-x-2">
+        <Link 
+          href={`/teams/${team.id}`}
+          className="flex items-center space-x-2 hover:underline"
+        >
           <TeamLogo
             src={team.crest}
             alt={team.name}
@@ -53,7 +57,7 @@ export default function StandingsTable({ standings, recentMatches }) {
           <span className="font-medium text-gray-900 text-xs">
             {team.shortName || team.name}
           </span>
-        </div>
+        </Link>
       </td>
       <td className="p-2 text-center text-gray-600 text-xs">{stats.played}</td>
       <td className="p-2 text-center text-green-600 font-medium text-xs">{stats.won}</td>
@@ -108,7 +112,10 @@ export default function StandingsTable({ standings, recentMatches }) {
                 <tr key={team.team?.id || index} className="border-b hover:bg-gray-50 transition-colors">
                   <td className="p-2 font-bold text-gray-900 text-xs">{team.position}</td>
                   <td className="p-2">
-                    <div className="flex items-center space-x-2">
+                    <Link 
+                      href={`/teams/${team.team.id}`}
+                      className="flex items-center space-x-2 hover:underline"
+                    >
                       <TeamLogo
                         src={team.team?.crest}
                         alt={team.team?.name}
@@ -117,7 +124,7 @@ export default function StandingsTable({ standings, recentMatches }) {
                       <span className="font-medium text-gray-900 text-xs">
                         {team.team?.shortName || team.team?.name}
                       </span>
-                    </div>
+                    </Link>
                   </td>
                   <td className="p-2 text-center text-gray-600 text-xs">{team.playedGames || 0}</td>
                   <td className="p-2 text-center text-green-600 font-medium text-xs">
@@ -203,7 +210,10 @@ export default function StandingsTable({ standings, recentMatches }) {
                     <tr key={`away-${team.team.id}`} className="border-b hover:bg-gray-50 transition-colors">
                       <td className="p-2 font-bold text-gray-900 text-xs">{team.position}</td>
                       <td className="p-2">
-                        <div className="flex items-center space-x-2">
+                        <Link 
+                          href={`/teams/${team.team.id}`}
+                          className="flex items-center space-x-2 hover:underline"
+                        >
                           <TeamLogo
                             src={team.team.crest}
                             alt={team.team.name}
@@ -212,7 +222,7 @@ export default function StandingsTable({ standings, recentMatches }) {
                           <span className="font-medium text-gray-900 text-xs">
                             {team.team.shortName || team.team.name}
                           </span>
-                        </div>
+                        </Link>
                       </td>
                       <td className="p-2 text-center text-gray-600 text-xs">{team.away.played}</td>
                       <td className="p-2 text-center text-green-600 font-medium text-xs">{team.away.won}</td>
@@ -265,7 +275,10 @@ export default function StandingsTable({ standings, recentMatches }) {
                         {formatDate(match.utcDate)}
                       </td>
                       <td className="p-2">
-                        <div className="flex items-center space-x-2">
+                        <Link 
+                          href={`/teams/${match.homeTeam.id}`}
+                          className="flex items-center space-x-2 hover:underline"
+                        >
                           <TeamLogo
                             src={match.homeTeam.crest}
                             alt={match.homeTeam.name}
@@ -274,7 +287,7 @@ export default function StandingsTable({ standings, recentMatches }) {
                           <span className="font-medium text-gray-900 text-xs">
                             {match.homeTeam.shortName || match.homeTeam.name}
                           </span>
-                        </div>
+                        </Link>
                       </td>
                       <td className="p-2 text-center">
                         <div className="flex items-center justify-center space-x-1">
@@ -284,7 +297,10 @@ export default function StandingsTable({ standings, recentMatches }) {
                         </div>
                       </td>
                       <td className="p-2">
-                        <div className="flex items-center space-x-2">
+                        <Link 
+                          href={`/teams/${match.awayTeam.id}`}
+                          className="flex items-center space-x-2 hover:underline"
+                        >
                           <TeamLogo
                             src={match.awayTeam.crest}
                             alt={match.awayTeam.name}
@@ -293,7 +309,7 @@ export default function StandingsTable({ standings, recentMatches }) {
                           <span className="font-medium text-gray-900 text-xs">
                             {match.awayTeam.shortName || match.awayTeam.name}
                           </span>
-                        </div>
+                        </Link>
                       </td>
                     </tr>
                   ))}
