@@ -1,74 +1,88 @@
 // app/page.js
 import Link from 'next/link';
-import LeagueLogo from '../components/LeagueLogo';
+import { getUpcomingMatches } from '../lib/api';
+import FixturesList from '../components/FixturesList';
 
-export default function Home() {
+export default async function Home() {
+  // Fetch upcoming matches for top leagues
+  const topLeagueIds = ['2021', '2014', '2019', '2002', '2015'];
+
+  let allUpcomingMatches = [];
+  try {
+    const matchesPromises = topLeagueIds.map(id => getUpcomingMatches(id, 3));
+    const results = await Promise.all(matchesPromises);
+    allUpcomingMatches = results.flat().sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate)).slice(0, 10);
+  } catch (error) {
+    console.error('Error fetching upcoming matches for home page:', error);
+  }
+
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to FootballSite ⚽
+    <div className="min-h-full pb-20">
+      {/* Hero Section */}
+      <div className="bg-primary py-20 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:20px_20px]"></div>
+        </div>
+        <div className="container mx-auto px-6 relative text-center">
+          <h1 className="text-4xl md:text-7xl font-black text-white mb-6 tracking-tight">
+            FOOTBALL <span className="text-secondary">ANALYTICS</span>
           </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Your ultimate destination for football statistics and standings from top leagues around the world.
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 font-medium">
+            Professional-grade statistics, standings, and performance insights for the world's top football leagues.
           </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/leagues/2021" className="bg-secondary hover:bg-secondary/90 text-white px-8 py-4 rounded-2xl font-bold transition-all premium-shadow-lg">
+              Explore Analytics
+            </Link>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Link 
-            href="/leagues/2021" 
-            className="bg-white p-6 rounded-lg shadow-md border-2 border-transparent hover:border-blue-500 hover:shadow-lg transition-all duration-200 group"
-          >
-            <div className="text-center">
-              <LeagueLogo
-                src="https://crests.football-data.org/PL.png"
-                alt="Premier League"
-                className="w-16 h-16 mx-auto mb-3 group-hover:scale-110 transition-transform"
-              />
-              <h2 className="text-xl font-semibold mb-2">Premier League</h2>
-              <p className="text-gray-600 text-sm">England</p>
-            </div>
-          </Link>
-          
-          <Link 
-            href="/leagues/2014" 
-            className="bg-white p-6 rounded-lg shadow-md border-2 border-transparent hover:border-red-500 hover:shadow-lg transition-all duration-200 group"
-          >
-            <div className="text-center">
-              <LeagueLogo
-                src="https://crests.football-data.org/PD.png"
-                alt="La Liga"
-                className="w-16 h-16 mx-auto mb-3 group-hover:scale-110 transition-transform"
-              />
-              <h2 className="text-xl font-semibold mb-2">La Liga</h2>
-              <p className="text-gray-600 text-sm">Spain</p>
-            </div>
-          </Link>
-          
-          <Link 
-            href="/leagues/2002" 
-            className="bg-white p-6 rounded-lg shadow-md border-2 border-transparent hover:border-yellow-500 hover:shadow-lg transition-all duration-200 group"
-          >
-            <div className="text-center">
-              <LeagueLogo
-                src="https://crests.football-data.org/BL1.png"
-                alt="Bundesliga"
-                className="w-16 h-16 mx-auto mb-3 group-hover:scale-110 transition-transform"
-              />
-              <h2 className="text-xl font-semibold mb-2">Bundesliga</h2>
-              <p className="text-gray-600 text-sm">Germany</p>
-            </div>
-          </Link>
-        </div>
+      </div>
 
-        <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">How to use:</h3>
-          <ul className="text-blue-700 list-disc list-inside space-y-1">
-            <li>Click on any league in the sidebar to view standings</li>
-            <li>Use the quick links above for popular leagues</li>
-            <li>Browse "Top Leagues" or "All Leagues" in the sidebar</li>
-          </ul>
+      <div className="container mx-auto px-6 mt-8">
+        <div className="space-y-12">
+          {/* Top Upcoming Matches Section */}
+          <section>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Top Upcoming Matches</h2>
+              <span className="text-[10px] font-black text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-widest">Global Coverage</span>
+            </div>
+            <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+              {allUpcomingMatches.length > 0 ? (
+                <FixturesList fixtures={allUpcomingMatches} title={null} />
+              ) : (
+                <div className="p-12 text-center">
+                  <p className="text-slate-400 font-medium">No upcoming matches found at the moment.</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Info Section */}
+          <div className="glass-card rounded-3xl p-10 border border-white/5 premium-shadow">
+            <div className="flex flex-col md:flex-row items-center gap-10">
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-white mb-4">How to use the platform:</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-secondary/20 text-secondary rounded-lg flex items-center justify-center font-bold flex-shrink-0">1</div>
+                    <p className="text-slate-400 text-sm leading-relaxed">Select a league from the sidebar to view live standings and deep analytics.</p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-secondary/20 text-secondary rounded-lg flex items-center justify-center font-bold flex-shrink-0">2</div>
+                    <p className="text-slate-400 text-sm leading-relaxed">Analyze "Power Pots" to see which teams are overperforming or struggling.</p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-secondary/20 text-secondary rounded-lg flex items-center justify-center font-bold flex-shrink-0">3</div>
+                    <p className="text-slate-400 text-sm leading-relaxed">Check "Under/Over" stats to identify betting trends and goal patterns.</p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-secondary/20 text-secondary rounded-lg flex items-center justify-center font-bold flex-shrink-0">4</div>
+                    <p className="text-slate-400 text-sm leading-relaxed">Click on any team to see their detailed season performance and form.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

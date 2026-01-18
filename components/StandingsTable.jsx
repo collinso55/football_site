@@ -1,324 +1,185 @@
-// components/StandingsTable.js
+// components/StandingsTable.jsx
 'use client';
 
 import TeamLogo from './TeamLogo';
 import Link from 'next/link';
 
-export default function StandingsTable({ standings, recentMatches }) {
+export default function StandingsTable({ standings, recentMatches, allMatches, liveMatches = [] }) {
   if (!standings || standings.length === 0) {
     return (
-      <div className="p-6 text-center">
-        <div className="text-gray-500">
-          <p className="text-sm">No standings data available for this league.</p>
-          <p className="text-xs mt-1">The season may not have started yet.</p>
+      <div className="p-12 text-center">
+        <div className="text-muted">
+          <p className="text-sm font-bold uppercase tracking-widest">No standings data available</p>
+          <p className="text-xs mt-2">The season may not have started yet.</p>
         </div>
       </div>
     );
   }
 
-  // Function to create home/away tables from the main standings
-  const createHomeAwayTables = (standings) => {
-    return standings.map(team => ({
-      position: team.position,
-      team: team.team,
-      // For demo purposes - in real data, these would come from the API
-      home: {
-        played: Math.floor(team.playedGames / 2),
-        won: Math.floor(team.won / 2),
-        draw: Math.floor(team.draw / 2),
-        lost: Math.floor(team.lost / 2),
-        points: Math.floor(team.points / 2)
-      },
-      away: {
-        played: Math.floor(team.playedGames / 2),
-        won: Math.floor(team.won / 2),
-        draw: Math.floor(team.draw / 2),
-        lost: Math.floor(team.lost / 2),
-        points: Math.floor(team.points / 2)
-      }
-    }));
+  // Helper to calculate standings from matches if API tables are missing
+  const calculateStandings = (matches) => {
+    if (!matches || matches.length === 0) return [];
+    const table = {};
+    matches.forEach(match => {
+      const homeId = match.homeTeam.id;
+      const awayId = match.awayTeam.id;
+
+      if (!table[homeId]) table[homeId] = { team: match.homeTeam, playedGames: 0, won: 0, draw: 0, lost: 0, points: 0 };
+      if (!table[awayId]) table[awayId] = { team: match.awayTeam, playedGames: 0, won: 0, draw: 0, lost: 0, points: 0 };
+
+      const homeScore = match.score.fullTime.home;
+      const awayScore = match.score.fullTime.away;
+
+      if (homeScore === null || awayScore === null) return;
+
+      table[homeId].playedGames++;
+      if (homeScore > awayScore) { table[homeId].won++; table[homeId].points += 3; }
+      else if (homeScore === awayScore) { table[homeId].draw++; table[homeId].points += 1; }
+      else table[homeId].lost++;
+
+      table[awayId].playedGames++;
+      if (awayScore > homeScore) { table[awayId].won++; table[awayId].points += 3; }
+      else if (awayScore === homeScore) { table[awayId].draw++; table[awayId].points += 1; }
+      else table[awayId].lost++;
+    });
+
+    return Object.values(table).sort((a, b) => b.points - a.points || (b.won - a.won));
   };
 
-  const homeAwayTables = createHomeAwayTables(standings);
+  // Extract total table with calculation fallback
+  const totalTable = standings.find(s => s.type === 'TOTAL')?.table || (allMatches ? calculateStandings(allMatches) : []);
 
-  const TableRow = ({ team, stats, position, isHome = true }) => (
-    <tr className="border-b hover:bg-gray-50 transition-colors">
-      <td className="p-2 font-bold text-gray-900 text-xs">{position}</td>
-      <td className="p-2">
-        <Link 
-          href={`/teams/${team.id}`}
-          className="flex items-center space-x-2 hover:underline"
-        >
-          <TeamLogo
-            src={team.crest}
-            alt={team.name}
-            className="w-6 h-6 object-contain"
-          />
-          <span className="font-medium text-gray-900 text-xs">
-            {team.shortName || team.name}
-          </span>
-        </Link>
-      </td>
-      <td className="p-2 text-center text-gray-600 text-xs">{stats.played}</td>
-      <td className="p-2 text-center text-green-600 font-medium text-xs">{stats.won}</td>
-      <td className="p-2 text-center text-yellow-600 font-medium text-xs">{stats.draw}</td>
-      <td className="p-2 text-center text-red-600 font-medium text-xs">{stats.lost}</td>
-      <td className="p-2 text-center font-bold text-gray-900 text-xs">{stats.points}</td>
-    </tr>
+  const TableHeader = ({ title, bgColor = "bg-white/5" }) => (
+    <div className={`px-8 py-4 ${bgColor} border-b border-border`}>
+      <h3 className="text-xs font-black text-secondary uppercase tracking-widest">{title}</h3>
+    </div>
   );
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric'
-    });
-  };
+  const TableRow = ({ team, stats, position }) => {
+    // Check if this team is currently playing a live match
+    const liveMatch = liveMatches.find(m =>
+      m.homeTeam.id === team.id || m.awayTeam.id === team.id
+    );
 
-  // Safe score display function
-  const displayScore = (match) => {
-    if (!match.score || !match.score.fullTime) {
-      return 'TBD';
-    }
-    const home = match.score.fullTime.home ?? '-';
-    const away = match.score.fullTime.away ?? '-';
-    return `${home} - ${away}`;
-  };
+    return (
+      <tr className="border-b border-border/50 hover:bg-white/5 transition-colors group">
+        <td className="px-6 py-4 font-black text-slate-400 text-xs w-12">{position}</td>
+        <td className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link
+              href={`/teams/${team.id}`}
+              className="flex items-center space-x-4 group/link"
+            >
+              <div className="w-8 h-8 bg-primary rounded-lg p-1.5 border border-border group-hover/link:border-secondary transition-colors shadow-sm">
+                <TeamLogo
+                  src={team.crest}
+                  alt={team.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <span className="font-bold text-slate-200 text-sm group-hover/link:text-secondary transition-colors truncate max-w-[100px] sm:max-w-none">
+                {team.shortName || team.name}
+              </span>
+            </Link>
 
-  // Get matchday from the first match (all should be from same matchday)
-  const matchday = recentMatches?.[0]?.matchday || 'Last';
+            {liveMatch && (
+              <div className="flex items-center gap-2 ml-2 flex-shrink-0 bg-rose-500/10 px-2 py-1 rounded-lg border border-rose-500/20">
+                <span className="flex h-1.5 w-1.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+                </span>
+                <span className="text-[9px] font-black text-rose-500 uppercase tracking-tighter hidden xs:inline">LIVE</span>
+                <span className="text-[10px] font-black text-white">
+                  {liveMatch.score.fullTime.home} - {liveMatch.score.fullTime.away}
+                </span>
+              </div>
+            )}
+          </div>
+        </td>
+        <td className="px-4 py-4 text-center text-slate-400 text-xs font-bold">{stats.playedGames || stats.played}</td>
+        <td className="px-4 py-4 text-center text-emerald-500 font-black text-xs">{stats.won}</td>
+        <td className="px-4 py-4 text-center text-amber-500 font-black text-xs">{stats.draw}</td>
+        <td className="px-4 py-4 text-center text-rose-500 font-black text-xs">{stats.lost}</td>
+        <td className="px-4 py-4 text-center">
+          <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-lg font-black text-xs">
+            {stats.points}
+          </span>
+        </td>
+      </tr>
+    );
+  };
 
   return (
-    <div className="space-y-8">
-      {/* General Standings Table */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3 px-4">General Standings</h3>
-        <div className="overflow-x-auto">
+    <div className="space-y-12">
+      {/* General Standings */}
+      <div className="overflow-hidden">
+        <TableHeader title="General Standings" />
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="p-2 text-left font-semibold text-gray-700 text-xs">#</th>
-                <th className="p-2 text-left font-semibold text-gray-700 text-xs">Team</th>
-                <th className="p-2 text-center font-semibold text-gray-700 text-xs">MP</th>
-                <th className="p-2 text-center font-semibold text-gray-700 text-xs">W</th>
-                <th className="p-2 text-center font-semibold text-gray-700 text-xs">D</th>
-                <th className="p-2 text-center font-semibold text-gray-700 text-xs">L</th>
-                <th className="p-2 text-center font-semibold text-gray-700 text-xs">GD</th>
-                <th className="p-2 text-center font-semibold text-gray-700 text-xs">PTS</th>
+            <thead className="bg-white/2">
+              <tr>
+                <th className="px-6 py-3 text-left text-[10px] font-black text-muted uppercase tracking-widest">Pos</th>
+                <th className="px-6 py-3 text-left text-[10px] font-black text-muted uppercase tracking-widest">Team</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">P</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">W</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">D</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">L</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">Pts</th>
               </tr>
             </thead>
-            <tbody>
-              {standings.map((team, index) => (
-                <tr key={team.team?.id || index} className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-2 font-bold text-gray-900 text-xs">{team.position}</td>
-                  <td className="p-2">
-                    <Link 
-                      href={`/teams/${team.team.id}`}
-                      className="flex items-center space-x-2 hover:underline"
-                    >
-                      <TeamLogo
-                        src={team.team?.crest}
-                        alt={team.team?.name}
-                        className="w-6 h-6 object-contain"
-                      />
-                      <span className="font-medium text-gray-900 text-xs">
-                        {team.team?.shortName || team.team?.name}
-                      </span>
-                    </Link>
-                  </td>
-                  <td className="p-2 text-center text-gray-600 text-xs">{team.playedGames || 0}</td>
-                  <td className="p-2 text-center text-green-600 font-medium text-xs">
-                    {team.won || 0}
-                  </td>
-                  <td className="p-2 text-center text-yellow-600 font-medium text-xs">
-                    {team.draw || 0}
-                  </td>
-                  <td className="p-2 text-center text-red-600 font-medium text-xs">
-                    {team.lost || 0}
-                  </td>
-                  <td className="p-2 text-center font-bold text-gray-900 text-xs">
-                    {team.goalDifference > 0 ? '+' : ''}{team.goalDifference || 0}
-                  </td>
-                  <td className="p-2 text-center font-bold text-blue-600 text-xs">
-                    {team.points || 0}
-                  </td>
-                </tr>
+            <tbody className="divide-y divide-border/30">
+              {totalTable.map((team, idx) => (
+                <TableRow
+                  key={team.team.id}
+                  team={team.team}
+                  stats={team}
+                  position={team.position || idx + 1}
+                />
               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Home and Away Tables - Side by Side */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 px-4">Home & Away Performance</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Home Table - Left Side */}
-          <div className="bg-white rounded-lg border overflow-hidden shadow-sm">
-            <div className="bg-blue-50 px-4 py-3 border-b">
-              <h4 className="font-semibold text-gray-800 text-sm">Home Performance</h4>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b">
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">#</th>
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">Team</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">MP</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">W</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">D</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">L</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {homeAwayTables.map((team, index) => (
-                    <TableRow
-                      key={`home-${team.team.id}`}
-                      team={team.team}
-                      stats={team.home}
-                      position={team.position}
-                      isHome={true}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Away Table - Right Side */}
-          <div className="bg-white rounded-lg border overflow-hidden shadow-sm">
-            <div className="bg-green-50 px-4 py-3 border-b">
-              <h4 className="font-semibold text-gray-800 text-sm">Away Performance</h4>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b">
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">#</th>
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">Team</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">MP</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">W</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">D</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">L</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {homeAwayTables.map((team, index) => (
-                    <tr key={`away-${team.team.id}`} className="border-b hover:bg-gray-50 transition-colors">
-                      <td className="p-2 font-bold text-gray-900 text-xs">{team.position}</td>
-                      <td className="p-2">
-                        <Link 
-                          href={`/teams/${team.team.id}`}
-                          className="flex items-center space-x-2 hover:underline"
-                        >
-                          <TeamLogo
-                            src={team.team.crest}
-                            alt={team.team.name}
-                            className="w-6 h-6 object-contain"
-                          />
-                          <span className="font-medium text-gray-900 text-xs">
-                            {team.team.shortName || team.team.name}
-                          </span>
-                        </Link>
-                      </td>
-                      <td className="p-2 text-center text-gray-600 text-xs">{team.away.played}</td>
-                      <td className="p-2 text-center text-green-600 font-medium text-xs">{team.away.won}</td>
-                      <td className="p-2 text-center text-yellow-600 font-medium text-xs">{team.away.draw}</td>
-                      <td className="p-2 text-center text-red-600 font-medium text-xs">{team.away.lost}</td>
-                      <td className="p-2 text-center font-bold text-gray-900 text-xs">{team.away.points}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Spacing after Home/Away tables */}
-      <div className="mt-8"></div>
-
-      {/* Recent Results Table - Shows all matches from last completed matchday */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 px-4">
-          Recent Results - Matchday {matchday}
-        </h3>
-        <div className="bg-white rounded-lg border overflow-hidden shadow-sm">
-          <div className="bg-purple-50 px-4 py-3 border-b">
-            <h4 className="font-semibold text-gray-800 text-sm">
-              Latest Matchday Results ({recentMatches?.length || 0} matches)
-            </h4>
-          </div>
-          <div className="overflow-x-auto">
-            {(!recentMatches || recentMatches.length === 0) ? (
-              <div className="p-6 text-center">
-                <p className="text-gray-500 text-sm">No recent match results available.</p>
-                <p className="text-gray-400 text-xs mt-1">Matches may not have been played recently.</p>
+      {/* Recent Results */}
+      {recentMatches && recentMatches.length > 0 && (
+        <div className="pb-8">
+          <TableHeader title="Recent Results" />
+          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {recentMatches.map((match) => (
+              <div key={match.id} className="bg-primary/50 border border-border/50 p-4 rounded-2xl hover:border-secondary transition-all group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-black text-muted uppercase tracking-tighter">
+                    {new Date(match.utcDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </span>
+                  <span className="text-[9px] font-black text-secondary bg-secondary/10 px-2 py-0.5 rounded uppercase tracking-tighter">
+                    FT
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 flex items-center gap-3 min-w-0">
+                    <div className="w-6 h-6 flex-shrink-0">
+                      <TeamLogo src={match.homeTeam.crest} className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-200 truncate">{match.homeTeam.shortName || match.homeTeam.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-primary px-3 py-1 rounded-lg border border-border">
+                    <span className="text-sm font-black text-white">{match.score.fullTime.home}</span>
+                    <span className="text-xs font-bold text-muted">-</span>
+                    <span className="text-sm font-black text-white">{match.score.fullTime.away}</span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-end gap-3 min-w-0">
+                    <span className="text-xs font-bold text-slate-200 truncate">{match.awayTeam.shortName || match.awayTeam.name}</span>
+                    <div className="w-6 h-6 flex-shrink-0">
+                      <TeamLogo src={match.awayTeam.crest} className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b">
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">Date</th>
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">Home Team</th>
-                    <th className="p-2 text-center font-semibold text-gray-700 text-xs">Score</th>
-                    <th className="p-2 text-left font-semibold text-gray-700 text-xs">Away Team</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentMatches.map((match) => (
-                    <tr key={match.id} className="border-b hover:bg-gray-50 transition-colors">
-                      <td className="p-2 text-gray-600 text-xs">
-                        {formatDate(match.utcDate)}
-                      </td>
-                      <td className="p-2">
-                        <Link 
-                          href={`/teams/${match.homeTeam.id}`}
-                          className="flex items-center space-x-2 hover:underline"
-                        >
-                          <TeamLogo
-                            src={match.homeTeam.crest}
-                            alt={match.homeTeam.name}
-                            className="w-6 h-6 object-contain"
-                          />
-                          <span className="font-medium text-gray-900 text-xs">
-                            {match.homeTeam.shortName || match.homeTeam.name}
-                          </span>
-                        </Link>
-                      </td>
-                      <td className="p-2 text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          <span className="font-bold text-gray-900 text-xs bg-gray-100 px-2 py-1 rounded">
-                            {displayScore(match)}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-2">
-                        <Link 
-                          href={`/teams/${match.awayTeam.id}`}
-                          className="flex items-center space-x-2 hover:underline"
-                        >
-                          <TeamLogo
-                            src={match.awayTeam.crest}
-                            alt={match.awayTeam.name}
-                            className="w-6 h-6 object-contain"
-                          />
-                          <span className="font-medium text-gray-900 text-xs">
-                            {match.awayTeam.shortName || match.awayTeam.name}
-                          </span>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

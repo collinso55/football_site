@@ -1,346 +1,116 @@
-// components/StatsTables.js
+// components/StatsTables.jsx
 'use client';
 
 import TeamLogo from './TeamLogo';
 
 export default function StatsTables({ standings, recentMatches }) {
-  // Add this at the top of your StatsTables component, after the imports
-  if (!recentMatches || recentMatches.length === 0) {
+  if (!recentMatches || recentMatches.length === 0 || !standings || standings.length === 0) {
     return (
-      <div className="space-y-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Statistics Tables</h3>
-          <p className="text-gray-500 text-sm">
-            Match data is currently unavailable. Statistics will be displayed when match data is loaded.
-          </p>
-          <p className="text-gray-400 text-xs mt-1">
-            This could be due to API limitations or no matches being played yet.
-          </p>
+      <div className="p-16 text-center">
+        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
         </div>
+        <h3 className="text-lg font-black text-white mb-2 uppercase tracking-widest">Advanced Statistics</h3>
+        <p className="text-muted text-xs max-w-xs mx-auto font-bold uppercase tracking-tighter">Detailed performance metrics will be available once more match data is synchronized.</p>
       </div>
     );
   }
 
-  if (!standings || standings.length === 0) {
-    return (
-      <div className="p-4 text-center">
-        <p className="text-gray-500 text-sm">No statistics data available.</p>
-      </div>
-    );
-  }
-
-  // Calculate Under/Over statistics for each team
   const calculateUnderOverStats = (teamId, matches) => {
-    const teamMatches = matches.filter(match => 
-      (match.homeTeam.id === teamId || match.awayTeam.id === teamId) && 
-      match.status === 'FINISHED'
+    const teamMatches = matches.filter(match =>
+      (match.homeTeam.id === teamId || match.awayTeam.id === teamId) && match.status === 'FINISHED'
     );
-
-    const homeMatches = teamMatches.filter(match => match.homeTeam.id === teamId);
-    const awayMatches = teamMatches.filter(match => match.awayTeam.id === teamId);
-
     const calculateStats = (matchList) => {
       const total = matchList.length;
       if (total === 0) return { under25: 0, over25: 0, under25Pct: 0, over25Pct: 0 };
-
-      const under25 = matchList.filter(match => {
-        const totalGoals = (match.score?.fullTime?.home || 0) + (match.score?.fullTime?.away || 0);
-        return totalGoals < 2.5;
-      }).length;
-
-      const over25 = total - under25;
-
-      return {
-        under25,
-        over25,
-        under25Pct: total > 0 ? Math.round((under25 / total) * 100) : 0,
-        over25Pct: total > 0 ? Math.round((over25 / total) * 100) : 0
-      };
+      const under25 = matchList.filter(match => ((match.score?.fullTime?.home || 0) + (match.score?.fullTime?.away || 0)) < 2.5).length;
+      return { under25, over25: total - under25, under25Pct: Math.round((under25 / total) * 100), over25Pct: Math.round(((total - under25) / total) * 100) };
     };
-
-    const totalStats = calculateStats(teamMatches);
-    const homeStats = calculateStats(homeMatches);
-    const awayStats = calculateStats(awayMatches);
-
-    return { total: totalStats, home: homeStats, away: awayStats };
-  };
-
-  // Calculate Goals Per Match distribution
-  const calculateGoalsDistribution = (teamId, matches) => {
-    const teamMatches = matches.filter(match => 
-      (match.homeTeam.id === teamId || match.awayTeam.id === teamId) && 
-      match.status === 'FINISHED'
-    );
-
-    const homeMatches = teamMatches.filter(match => match.homeTeam.id === teamId);
-    const awayMatches = teamMatches.filter(match => match.awayTeam.id === teamId);
-
-    const calculateDistribution = (matchList) => {
-      const distribution = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, over6: 0 };
-      let totalGoals = 0;
-
-      matchList.forEach(match => {
-        const goals = (match.score?.fullTime?.home || 0) + (match.score?.fullTime?.away || 0);
-        totalGoals += goals;
-
-        if (goals <= 6) {
-          distribution[goals]++;
-        } else {
-          distribution.over6++;
-        }
-      });
-
-      const avg = matchList.length > 0 ? (totalGoals / matchList.length).toFixed(2) : '0.00';
-
-      return { distribution, avg, total: matchList.length };
-    };
-
-    const totalDist = calculateDistribution(teamMatches);
-    const homeDist = calculateDistribution(homeMatches);
-    const awayDist = calculateDistribution(awayMatches);
-
-    return { total: totalDist, home: homeDist, away: awayDist };
-  };
-
-  // Generate mock data for demonstration (replace with real calculations)
-  const teamsWithStats = standings.map((team, index) => {
-    const underOverStats = calculateUnderOverStats(team.team.id, recentMatches || []);
-    const goalsDist = calculateGoalsDistribution(team.team.id, recentMatches || []);
-
     return {
-      position: index + 1,
-      team: team.team,
-      underOver: underOverStats,
-      goalsDistribution: goalsDist
+      total: calculateStats(teamMatches),
+      home: calculateStats(teamMatches.filter(m => m.homeTeam.id === teamId)),
+      away: calculateStats(teamMatches.filter(m => m.awayTeam.id === teamId))
     };
-  });
+  };
+
+  const teamsWithStats = standings.slice(0, 10).map((team, index) => ({
+    position: index + 1,
+    team: team.team,
+    underOver: calculateUnderOverStats(team.team.id, recentMatches)
+  }));
+
+  const StatBadge = ({ pct, type }) => (
+    <div className="flex flex-col items-center">
+      <div className={`text-[10px] font-black ${type === 'under' ? 'text-blue-500' : 'text-rose-500'}`}>{pct}%</div>
+      <div className="w-16 h-1.5 bg-white/5 rounded-full mt-1.5 overflow-hidden border border-white/5">
+        <div className={`h-full ${type === 'under' ? 'bg-blue-500' : 'bg-rose-500'} shadow-[0_0_8px_rgba(0,0,0,0.5)]`} style={{ width: `${pct}%` }}></div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-8">
-      {/* UNDER/OVER TABLE */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div className="bg-blue-50 px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">UNDER/OVER TABLE</h3>
+    <div className="space-y-12">
+      {/* Under/Over Table */}
+      <div className="overflow-hidden">
+        <div className="px-8 py-6 border-b border-border/50 bg-white/2 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-xs font-black text-secondary uppercase tracking-widest">Under/Over 2.5 Goals</h3>
+            <p className="text-[10px] font-bold text-muted uppercase mt-1">Goal frequency analysis</p>
+          </div>
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+              <span className="text-[10px] font-black text-muted uppercase tracking-widest">Under</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+              <span className="text-[10px] font-black text-muted uppercase tracking-widest">Over</span>
+            </div>
+          </div>
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="bg-gray-50 border-b">
-                <th rowSpan="2" className="p-3 text-left font-semibold text-gray-700 border-r">#</th>
-                <th rowSpan="2" className="p-3 text-left font-semibold text-gray-700 border-r">Team</th>
-                <th colSpan="4" className="p-2 text-center font-semibold text-gray-700 border-b border-r">TOTAL</th>
-                <th colSpan="4" className="p-2 text-center font-semibold text-gray-700 border-b border-r">HOME</th>
-                <th colSpan="4" className="p-2 text-center font-semibold text-gray-700 border-b">AWAY</th>
-              </tr>
-              <tr className="bg-gray-50 border-b">
-                {/* TOTAL Headers */}
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">UNDER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">OVER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">UNDER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">OVER 2.5</th>
-                
-                {/* HOME Headers */}
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">UNDER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">OVER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">UNDER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">OVER 2.5</th>
-                
-                {/* AWAY Headers */}
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">UNDER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">OVER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700 border-r">UNDER 2.5</th>
-                <th className="p-2 text-center font-semibold text-gray-700">OVER 2.5</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teamsWithStats.map((team) => (
-                <tr key={team.team.id} className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-3 font-bold text-gray-900 border-r">{team.position}</td>
-                  <td className="p-3 border-r">
-                    <div className="flex items-center space-x-2">
-                      <TeamLogo
-                        src={team.team.crest}
-                        alt={team.team.name}
-                        className="w-6 h-6 object-contain"
-                      />
-                      <span className="font-medium text-gray-900 text-xs">
-                        {team.team.shortName || team.team.name}
-                      </span>
-                    </div>
-                  </td>
-                  
-                  {/* TOTAL Stats */}
-                  <td className="p-2 text-center text-gray-600 border-r">
-                    {team.underOver.total.under25} / {team.underOver.total.under25 + team.underOver.total.over25}
-                  </td>
-                  <td className="p-2 text-center text-gray-600 border-r">
-                    {team.underOver.total.over25} / {team.underOver.total.under25 + team.underOver.total.over25}
-                  </td>
-                  <td className="p-2 text-center font-semibold text-blue-600 border-r">
-                    {team.underOver.total.under25Pct}%
-                  </td>
-                  <td className="p-2 text-center font-semibold text-red-600 border-r">
-                    {team.underOver.total.over25Pct}%
-                  </td>
-                  
-                  {/* HOME Stats */}
-                  <td className="p-2 text-center text-gray-600 border-r">
-                    {team.underOver.home.under25} / {team.underOver.home.under25 + team.underOver.home.over25}
-                  </td>
-                  <td className="p-2 text-center text-gray-600 border-r">
-                    {team.underOver.home.over25} / {team.underOver.home.under25 + team.underOver.home.over25}
-                  </td>
-                  <td className="p-2 text-center font-semibold text-blue-600 border-r">
-                    {team.underOver.home.under25Pct}%
-                  </td>
-                  <td className="p-2 text-center font-semibold text-red-600 border-r">
-                    {team.underOver.home.over25Pct}%
-                  </td>
-                  
-                  {/* AWAY Stats */}
-                  <td className="p-2 text-center text-gray-600 border-r">
-                    {team.underOver.away.under25} / {team.underOver.away.under25 + team.underOver.away.over25}
-                  </td>
-                  <td className="p-2 text-center text-gray-600 border-r">
-                    {team.underOver.away.over25} / {team.underOver.away.under25 + team.underOver.away.over25}
-                  </td>
-                  <td className="p-2 text-center font-semibold text-blue-600 border-r">
-                    {team.underOver.away.under25Pct}%
-                  </td>
-                  <td className="p-2 text-center font-semibold text-red-600">
-                    {team.underOver.away.over25Pct}%
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      {/* GOALS PER MATCH TABLE */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div className="bg-green-50 px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">GOALS PER MATCH</h3>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="bg-gray-50 border-b">
-                <th rowSpan="2" className="p-3 text-left font-semibold text-gray-700 border-r">#</th>
-                <th rowSpan="2" className="p-3 text-left font-semibold text-gray-700 border-r">Team</th>
-                
-                {/* OVERALL Headers */}
-                <th colSpan="10" className="p-1 text-center font-semibold text-gray-700 border-b border-r">OVERALL</th>
-                
-                {/* HOME Headers */}
-                <th colSpan="10" className="p-1 text-center font-semibold text-gray-700 border-b border-r">HOME</th>
-                
-                {/* AWAY Headers */}
-                <th colSpan="10" className="p-1 text-center font-semibold text-gray-700 border-b">AWAY</th>
-              </tr>
-              <tr className="bg-gray-50 border-b">
-                {/* OVERALL Sub-headers */}
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">P</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">0</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">1</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">2</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">3</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">4</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">5</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">6</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">6+</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">AVG</th>
-                
-                {/* HOME Sub-headers */}
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">P</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">0</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">1</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">2</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">3</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">4</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">5</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">6</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">6+</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">AVG</th>
-                
-                {/* AWAY Sub-headers */}
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">P</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">0</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">1</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">2</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">3</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">4</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">5</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">6</th>
-                <th className="p-1 text-center font-semibold text-gray-700 border-r">6+</th>
-                <th className="p-1 text-center font-semibold text-gray-700">AVG</th>
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full">
+            <thead className="bg-white/2 border-b border-border/30">
+              <tr>
+                <th className="px-8 py-4 text-left text-[10px] font-black text-muted uppercase tracking-widest">Team</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-muted uppercase tracking-widest">Overall</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-muted uppercase tracking-widest">Home</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-muted uppercase tracking-widest">Away</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/30">
               {teamsWithStats.map((team) => (
-                <tr key={team.team.id} className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-3 font-bold text-gray-900 border-r">{team.position}</td>
-                  <td className="p-3 border-r">
-                    <div className="flex items-center space-x-2">
-                      <TeamLogo
-                        src={team.team.crest}
-                        alt={team.team.name}
-                        className="w-6 h-6 object-contain"
-                      />
-                      <span className="font-medium text-gray-900 text-xs">
+                <tr key={team.team.id} className="hover:bg-white/5 transition-colors group">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-8 h-8 bg-primary rounded-lg p-1.5 border border-border group-hover:border-secondary transition-colors">
+                        <TeamLogo src={team.team.crest} className="w-full h-full object-contain" />
+                      </div>
+                      <span className="text-sm font-black text-slate-200 group-hover:text-secondary transition-colors truncate max-w-[150px]">
                         {team.team.shortName || team.team.name}
                       </span>
                     </div>
                   </td>
-                  
-                  {/* OVERALL Goals Distribution */}
-                  <td className="p-1 text-center text-gray-600 border-r">
-                    {team.goalsDistribution.total.total}
+                  <td className="px-8 py-5">
+                    <div className="flex items-center justify-center gap-6">
+                      <StatBadge pct={team.underOver.total.under25Pct} type="under" />
+                      <StatBadge pct={team.underOver.total.over25Pct} type="over" />
+                    </div>
                   </td>
-                  {[0, 1, 2, 3, 4, 5, 6].map(goals => (
-                    <td key={goals} className="p-1 text-center text-gray-600 border-r">
-                      {team.goalsDistribution.total.distribution[goals]}
-                    </td>
-                  ))}
-                  <td className="p-1 text-center text-gray-600 border-r">
-                    {team.goalsDistribution.total.distribution.over6}
+                  <td className="px-8 py-5">
+                    <div className="flex items-center justify-center gap-6">
+                      <StatBadge pct={team.underOver.home.under25Pct} type="under" />
+                      <StatBadge pct={team.underOver.home.over25Pct} type="over" />
+                    </div>
                   </td>
-                  <td className="p-1 text-center font-bold text-blue-600 border-r">
-                    {team.goalsDistribution.total.avg}
-                  </td>
-                  
-                  {/* HOME Goals Distribution */}
-                  <td className="p-1 text-center text-gray-600 border-r">
-                    {team.goalsDistribution.home.total}
-                  </td>
-                  {[0, 1, 2, 3, 4, 5, 6].map(goals => (
-                    <td key={goals} className="p-1 text-center text-gray-600 border-r">
-                      {team.goalsDistribution.home.distribution[goals]}
-                    </td>
-                  ))}
-                  <td className="p-1 text-center text-gray-600 border-r">
-                    {team.goalsDistribution.home.distribution.over6}
-                  </td>
-                  <td className="p-1 text-center font-bold text-blue-600 border-r">
-                    {team.goalsDistribution.home.avg}
-                  </td>
-                  
-                  {/* AWAY Goals Distribution */}
-                  <td className="p-1 text-center text-gray-600 border-r">
-                    {team.goalsDistribution.away.total}
-                  </td>
-                  {[0, 1, 2, 3, 4, 5, 6].map(goals => (
-                    <td key={goals} className="p-1 text-center text-gray-600 border-r">
-                      {team.goalsDistribution.away.distribution[goals]}
-                    </td>
-                  ))}
-                  <td className="p-1 text-center text-gray-600 border-r">
-                    {team.goalsDistribution.away.distribution.over6}
-                  </td>
-                  <td className="p-1 text-center font-bold text-blue-600">
-                    {team.goalsDistribution.away.avg}
+                  <td className="px-8 py-5">
+                    <div className="flex items-center justify-center gap-6">
+                      <StatBadge pct={team.underOver.away.under25Pct} type="under" />
+                      <StatBadge pct={team.underOver.away.over25Pct} type="over" />
+                    </div>
                   </td>
                 </tr>
               ))}
