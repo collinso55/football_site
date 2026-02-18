@@ -2,6 +2,7 @@
 import { getTeamDetails, getTeamMatches } from '../../../lib/api';
 import TeamLogo from '../../../components/TeamLogo';
 import CountryFlag from '../../../components/CountryFlag';
+import BackButton from '../../../components/BackButton';
 
 export default async function TeamPage({ params }) {
   const { id } = await params;
@@ -79,32 +80,33 @@ export default async function TeamPage({ params }) {
         </div>
 
         <div className="container mx-auto px-6 mt-8">
+          <BackButton />
           {/* VERTICAL LAYOUT - FULL WIDTH SECTIONS */}
           <div className="space-y-12">
             {/* Season Performance */}
             <section>
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Season Performance</h2>
-                <span className="text-[10px] font-black text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-widest">Analytics</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Season Performance</h2>
+                <span className="text-[10px] font-black text-primary bg-primary/5 px-3 py-1 rounded-full uppercase tracking-widest border border-primary/10">Analytics</span>
               </div>
-              <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+              <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                 <div className="p-8">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
-                    <div className="text-center bg-white/2 p-6 rounded-2xl border border-border/30">
-                      <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Matches</p>
-                      <p className="text-3xl font-black text-white">{stats.totalMatches}</p>
+                    <div className="text-center bg-slate-50/50 p-6 rounded-2xl border border-border/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Matches</p>
+                      <p className="text-3xl font-black text-slate-900">{stats.totalMatches}</p>
                     </div>
-                    <div className="text-center bg-white/2 p-6 rounded-2xl border border-border/30">
-                      <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Win Rate</p>
-                      <p className="text-3xl font-black text-emerald-500">{stats.totalMatches > 0 ? Math.round((stats.wins / stats.totalMatches) * 100) : 0}%</p>
+                    <div className="text-center bg-slate-50/50 p-6 rounded-2xl border border-border/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Win Rate</p>
+                      <p className="text-3xl font-black text-emerald-600">{stats.totalMatches > 0 ? Math.round((stats.wins / stats.totalMatches) * 100) : 0}%</p>
                     </div>
-                    <div className="text-center bg-white/2 p-6 rounded-2xl border border-border/30">
-                      <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Avg Goals</p>
-                      <p className="text-3xl font-black text-blue-500">{stats.totalMatches > 0 ? (stats.totalGoals / stats.totalMatches).toFixed(2) : '0.00'}</p>
+                    <div className="text-center bg-slate-50/50 p-6 rounded-2xl border border-border/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Avg Goals</p>
+                      <p className="text-3xl font-black text-blue-600">{stats.totalMatches > 0 ? (stats.totalGoals / stats.totalMatches).toFixed(2) : '0.00'}</p>
                     </div>
-                    <div className="text-center bg-white/2 p-6 rounded-2xl border border-border/30">
-                      <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Points</p>
-                      <p className="text-3xl font-black text-white">{stats.points}</p>
+                    <div className="text-center bg-slate-50/50 p-6 rounded-2xl border border-border/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Points</p>
+                      <p className="text-3xl font-black text-slate-900">{stats.points}</p>
                     </div>
                   </div>
 
@@ -127,9 +129,9 @@ export default async function TeamPage({ params }) {
             <div className="grid grid-cols-1 gap-12">
               <section>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Home Fortress</h2>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Home Fortress</h2>
                 </div>
-                <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                   <div className="p-8">
                     <HomeAwayStats stats={homeStats} type="home" />
                   </div>
@@ -138,9 +140,9 @@ export default async function TeamPage({ params }) {
 
               <section>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Away Form</h2>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Away Form</h2>
                 </div>
-                <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                   <div className="p-8">
                     <HomeAwayStats stats={awayStats} type="away" />
                   </div>
@@ -151,9 +153,9 @@ export default async function TeamPage({ params }) {
             {/* Match Results */}
             <section>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white">Recent Results</h2>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Recent Results</h2>
               </div>
-              <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+              <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                 <TeamMatchesTable matches={finishedMatches} team={team} />
               </div>
             </section>
@@ -175,17 +177,17 @@ export default async function TeamPage({ params }) {
   }
 }
 
-function StatRow({ label, value, total, color = "text-white" }) {
+function StatRow({ label, value, total, color = "text-slate-900" }) {
   const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
   return (
     <div className="flex items-center justify-between py-3">
-      <span className="text-[10px] font-black text-muted uppercase tracking-widest">{label}</span>
+      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
       <div className="flex items-center gap-4">
         <span className={`text-sm font-black ${color}`}>{value}</span>
-        <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-          <div className={`h-full ${color.replace('text', 'bg')} shadow-[0_0_8px_rgba(0,0,0,0.5)]`} style={{ width: `${percentage}%` }}></div>
+        <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden border border-border">
+          <div className={`h-full ${color.replace('text', 'bg')} opacity-80`} style={{ width: `${percentage}%` }}></div>
         </div>
-        <span className="text-[10px] font-black text-muted w-10 text-right">{percentage}%</span>
+        <span className="text-[10px] font-black text-slate-500 w-10 text-right">{percentage}%</span>
       </div>
     </div>
   );
@@ -195,20 +197,20 @@ function HomeAwayStats({ stats, type }) {
   const color = type === 'home' ? 'emerald' : 'blue';
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between bg-white/2 p-6 rounded-2xl border border-border/30">
+      <div className="flex items-center justify-between bg-slate-50/50 p-6 rounded-2xl border border-border/50">
         <div className="text-center flex-1">
-          <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Record (W-D-L)</p>
-          <p className="text-2xl font-black text-white">{stats.wins}-{stats.draws}-{stats.losses}</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Record (W-D-L)</p>
+          <p className="text-2xl font-black text-slate-900">{stats.wins}-{stats.draws}-{stats.losses}</p>
         </div>
-        <div className="w-px h-12 bg-border/30"></div>
+        <div className="w-px h-12 bg-border"></div>
         <div className="text-center flex-1">
-          <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Total Points</p>
-          <p className={`text-2xl font-black text-${color}-500`}>{stats.points} <span className="text-xs text-muted ml-1">PTS</span></p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Points</p>
+          <p className={`text-2xl font-black text-${color}-600`}>{stats.points} <span className="text-xs text-slate-500 ml-1 font-bold">PTS</span></p>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4">
-        <StatRow label="Goals Scored" value={stats.goalsFor} total={stats.totalMatches} color={`text-${color}-500`} />
-        <StatRow label="Goals Conceded" value={stats.goalsAgainst} total={stats.totalMatches} color="text-rose-500" />
+        <StatRow label="Goals Scored" value={stats.goalsFor} total={stats.totalMatches} color={`text-${color}-600`} />
+        <StatRow label="Goals Conceded" value={stats.goalsAgainst} total={stats.totalMatches} color="text-rose-600" />
       </div>
     </div>
   );
@@ -227,25 +229,25 @@ function TeamMatchesTable({ matches, team }) {
             const resultColor = result === 'W' ? 'bg-emerald-500' : result === 'D' ? 'bg-amber-500' : 'bg-rose-500';
 
             return (
-              <tr key={match.id} className="hover:bg-white/5 transition-colors group">
+              <tr key={match.id} className="hover:bg-slate-50 transition-colors group">
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-6">
                     <div className={`w-10 h-10 rounded-xl ${resultColor} flex items-center justify-center text-white text-xs font-black shadow-lg`}>{result}</div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black text-muted uppercase tracking-widest">{new Date(match.utcDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      <span className="text-xs font-black text-secondary uppercase tracking-tighter">{match.competition.name}</span>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{new Date(match.utcDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span className="text-xs font-black text-primary uppercase tracking-tighter">{match.competition.name}</span>
                     </div>
                   </div>
                 </td>
                 <td className="px-8 py-6 text-center">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <span className={`text-sm font-black uppercase tracking-tight ${isHome ? 'text-secondary' : 'text-slate-200'}`}>{match.homeTeam.shortName || match.homeTeam.name}</span>
-                    <div className="flex items-center gap-3 bg-primary px-4 py-1.5 rounded-xl border border-border shadow-inner">
-                      <span className="text-lg font-black text-white">{match.score.fullTime.home}</span>
-                      <span className="text-xs font-bold text-muted">-</span>
-                      <span className="text-lg font-black text-white">{match.score.fullTime.away}</span>
+                    <span className={`text-sm font-black uppercase tracking-tight ${isHome ? 'text-primary' : 'text-slate-700'}`}>{match.homeTeam.shortName || match.homeTeam.name}</span>
+                    <div className="flex items-center gap-3 bg-primary px-4 py-1.5 rounded-xl border border-primary/10 shadow-sm">
+                      <span className="text-sm font-black text-white">{match.score.fullTime.home}</span>
+                      <span className="text-xs font-bold text-white/50">-</span>
+                      <span className="text-sm font-black text-white">{match.score.fullTime.away}</span>
                     </div>
-                    <span className={`text-sm font-black uppercase tracking-tight ${!isHome ? 'text-secondary' : 'text-slate-200'}`}>{match.awayTeam.shortName || match.awayTeam.name}</span>
+                    <span className={`text-sm font-black uppercase tracking-tight ${!isHome ? 'text-primary' : 'text-slate-700'}`}>{match.awayTeam.shortName || match.awayTeam.name}</span>
                   </div>
                 </td>
               </tr>

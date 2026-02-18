@@ -43,9 +43,9 @@ export default function StatsTables({ standings, recentMatches }) {
 
   const StatBadge = ({ pct, type }) => (
     <div className="flex flex-col items-center">
-      <div className={`text-[10px] font-black ${type === 'under' ? 'text-blue-500' : 'text-rose-500'}`}>{pct}%</div>
-      <div className="w-16 h-1.5 bg-white/5 rounded-full mt-1.5 overflow-hidden border border-white/5">
-        <div className={`h-full ${type === 'under' ? 'bg-blue-500' : 'bg-rose-500'} shadow-[0_0_8px_rgba(0,0,0,0.5)]`} style={{ width: `${pct}%` }}></div>
+      <div className={`text-[10px] font-black ${type === 'under' ? 'text-blue-600' : 'text-rose-600'}`}>{pct}%</div>
+      <div className="w-16 h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden border border-slate-200">
+        <div className={`h-full ${type === 'under' ? 'bg-blue-600' : 'bg-rose-600'}`} style={{ width: `${pct}%` }}></div>
       </div>
     </div>
   );
@@ -53,43 +53,43 @@ export default function StatsTables({ standings, recentMatches }) {
   return (
     <div className="space-y-12">
       {/* Under/Over Table */}
-      <div className="overflow-hidden">
-        <div className="px-8 py-6 border-b border-border/50 bg-white/2 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="overflow-hidden bg-white border border-border rounded-2xl shadow-sm">
+        <div className="px-8 py-6 border-b border-border bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="text-xs font-black text-secondary uppercase tracking-widest">Under/Over 2.5 Goals</h3>
-            <p className="text-[10px] font-bold text-muted uppercase mt-1">Goal frequency analysis</p>
+            <h3 className="text-xs font-black text-primary uppercase tracking-widest">Under/Over 2.5 Goals</h3>
+            <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Goal frequency analysis</p>
           </div>
           <div className="flex gap-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
-              <span className="text-[10px] font-black text-muted uppercase tracking-widest">Under</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Under</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-              <span className="text-[10px] font-black text-muted uppercase tracking-widest">Over</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-rose-600"></div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Over</span>
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full">
-            <thead className="bg-white/2 border-b border-border/30">
+            <thead className="bg-slate-50 border-b border-border">
               <tr>
-                <th className="px-8 py-4 text-left text-[10px] font-black text-muted uppercase tracking-widest">Team</th>
-                <th className="px-8 py-4 text-center text-[10px] font-black text-muted uppercase tracking-widest">Overall</th>
-                <th className="px-8 py-4 text-center text-[10px] font-black text-muted uppercase tracking-widest">Home</th>
-                <th className="px-8 py-4 text-center text-[10px] font-black text-muted uppercase tracking-widest">Away</th>
+                <th className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Team</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Overall</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Home</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Away</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/30">
+            <tbody className="divide-y divide-border">
               {teamsWithStats.map((team) => (
-                <tr key={team.team.id} className="hover:bg-white/5 transition-colors group">
+                <tr key={team.team.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 bg-primary rounded-lg p-1.5 border border-border group-hover:border-secondary transition-colors">
+                      <div className="w-8 h-8 bg-white rounded-lg p-1.5 border border-border group-hover:border-primary transition-colors shadow-sm">
                         <TeamLogo src={team.team.crest} className="w-full h-full object-contain" />
                       </div>
-                      <span className="text-sm font-black text-slate-200 group-hover:text-secondary transition-colors truncate max-w-[150px]">
+                      <span className="text-sm font-black text-slate-900 group-hover:text-primary transition-colors truncate max-w-[150px]">
                         {team.team.shortName || team.team.name}
                       </span>
                     </div>

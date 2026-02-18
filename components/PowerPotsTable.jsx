@@ -42,30 +42,30 @@ export default function PowerPotsTable({ standings, leagueName = "this league" }
     <div className="p-8">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h3 className="text-xs font-black text-secondary uppercase tracking-widest">Power Analytics</h3>
+          <h3 className="text-xs font-black text-primary uppercase tracking-widest">Power Analytics</h3>
           <p className="text-[10px] font-bold text-muted uppercase mt-1">Tier-based performance segmentation</p>
         </div>
         <button
           onClick={() => setShowExplanation(!showExplanation)}
-          className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-muted hover:bg-secondary hover:text-white transition-all border border-white/5 font-black"
+          className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-all border border-border font-black shadow-sm"
         >
           ?
         </button>
       </div>
 
       {showExplanation && (
-        <div className="mb-10 p-8 bg-primary rounded-3xl text-white relative overflow-hidden border border-white/5">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-secondary opacity-10 rounded-full -mr-20 -mt-20"></div>
+        <div className="mb-10 p-8 bg-primary rounded-3xl text-white relative overflow-hidden shadow-xl">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -mr-20 -mt-20"></div>
           <h4 className="text-lg font-black mb-3">How segments are calculated</h4>
-          <p className="text-sm text-slate-400 leading-relaxed mb-6">
+          <p className="text-sm text-blue-100/80 leading-relaxed mb-6">
             We divide the league into 5 equal segments based on the current leader's points ({maxPoints} pts).
             Each segment represents {Math.ceil(segmentSize)} points of performance variance.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {pots.map(p => (
-              <div key={p.name} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
-                <div className={`w-3 h-3 rounded-full ${p.color} shadow-[0_0_10px_rgba(0,0,0,0.5)]`}></div>
-                <span className="text-[10px] font-black uppercase tracking-widest">{p.name}: <span className="text-slate-400 font-bold ml-1">{p.description}</span></span>
+              <div key={p.name} className="flex items-center gap-3 bg-white/10 p-3 rounded-xl border border-white/10">
+                <div className={`w-3 h-3 rounded-full ${p.color} shadow-sm border border-white/20`}></div>
+                <span className="text-[10px] font-black uppercase tracking-widest">{p.name}: <span className="text-blue-100/60 font-bold ml-1">{p.description}</span></span>
               </div>
             ))}
           </div>
@@ -78,23 +78,23 @@ export default function PowerPotsTable({ standings, leagueName = "this league" }
           if (teamsInPot.length === 0) return null;
 
           return (
-            <div key={pot.name} className={`rounded-3xl border border-border/50 overflow-hidden bg-white/2`}>
+            <div key={pot.name} className={`rounded-3xl border border-border overflow-hidden bg-white shadow-sm`}>
               <div className={`px-6 py-3 ${pot.bgColor} border-b border-border/50 flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
                   <div className={`w-2.5 h-2.5 rounded-full ${pot.color}`}></div>
                   <span className={`text-[10px] font-black uppercase tracking-widest ${pot.textColor}`}>{pot.name}</span>
                 </div>
-                <span className="text-[9px] font-black text-muted uppercase tracking-widest">{pot.description}</span>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{pot.description}</span>
               </div>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {teamsInPot.map(team => (
-                  <div key={team.team.id} className="flex items-center gap-3 p-3 rounded-2xl bg-primary/50 border border-border/50 hover:border-secondary transition-all group">
-                    <div className="w-8 h-8 flex-shrink-0 bg-primary rounded-lg p-1.5 border border-border">
+                  <div key={team.team.id} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-border hover:border-primary/30 transition-all group shadow-sm">
+                    <div className="w-8 h-8 flex-shrink-0 bg-white rounded-lg p-1.5 border border-border">
                       <TeamLogo src={team.team.crest} className="w-full h-full object-contain" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-black text-slate-200 truncate group-hover:text-secondary transition-colors">{team.team.tla || team.team.shortName}</p>
-                      <p className="text-[10px] font-bold text-muted uppercase">{team.points} PTS</p>
+                      <p className="text-xs font-black text-slate-900 truncate group-hover:text-primary transition-colors">{team.team.tla || team.team.shortName}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase">{team.points} PTS</p>
                     </div>
                   </div>
                 ))}
@@ -104,14 +104,14 @@ export default function PowerPotsTable({ standings, leagueName = "this league" }
         })}
       </div>
 
-      <div className="mt-12 pt-8 border-t border-border/30 grid grid-cols-2 gap-6">
-        <div className="bg-white/2 rounded-2xl p-6 text-center border border-border/30">
-          <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Leader Gap</p>
-          <p className="text-3xl font-black text-white">{maxPoints} <span className="text-xs text-muted ml-1">PTS</span></p>
+      <div className="mt-12 pt-8 border-t border-border grid grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl p-6 text-center border border-border shadow-sm">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Leader Gap</p>
+          <p className="text-3xl font-black text-slate-900">{maxPoints} <span className="text-xs text-slate-500 ml-1">PTS</span></p>
         </div>
-        <div className="bg-white/2 rounded-2xl p-6 text-center border border-border/30">
-          <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">Variance</p>
-          <p className="text-3xl font-black text-white">±{Math.ceil(segmentSize)} <span className="text-xs text-muted ml-1">PTS</span></p>
+        <div className="bg-white rounded-2xl p-6 text-center border border-border shadow-sm">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Variance</p>
+          <p className="text-3xl font-black text-slate-900">±{Math.ceil(segmentSize)} <span className="text-xs text-slate-500 ml-1">PTS</span></p>
         </div>
       </div>
     </div>

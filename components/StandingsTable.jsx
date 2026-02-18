@@ -8,7 +8,7 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
   if (!standings || standings.length === 0) {
     return (
       <div className="p-12 text-center">
-        <div className="text-muted">
+        <div className="text-slate-500">
           <p className="text-sm font-bold uppercase tracking-widest">No standings data available</p>
           <p className="text-xs mt-2">The season may not have started yet.</p>
         </div>
@@ -49,9 +49,9 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
   // Extract total table with calculation fallback
   const totalTable = standings.find(s => s.type === 'TOTAL')?.table || (allMatches ? calculateStandings(allMatches) : []);
 
-  const TableHeader = ({ title, bgColor = "bg-white/5" }) => (
+  const TableHeader = ({ title, bgColor = "bg-slate-50" }) => (
     <div className={`px-8 py-4 ${bgColor} border-b border-border`}>
-      <h3 className="text-xs font-black text-secondary uppercase tracking-widest">{title}</h3>
+      <h3 className="text-xs font-black text-primary uppercase tracking-widest">{title}</h3>
     </div>
   );
 
@@ -62,46 +62,46 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
     );
 
     return (
-      <tr className="border-b border-border/50 hover:bg-white/5 transition-colors group">
-        <td className="px-6 py-4 font-black text-slate-400 text-xs w-12">{position}</td>
+      <tr className="border-b border-border hover:bg-slate-50 transition-colors group">
+        <td className="px-6 py-4 font-black text-slate-500 text-xs w-12">{position}</td>
         <td className="px-6 py-4">
           <div className="flex items-center justify-between">
             <Link
               href={`/teams/${team.id}`}
               className="flex items-center space-x-4 group/link"
             >
-              <div className="w-8 h-8 bg-primary rounded-lg p-1.5 border border-border group-hover/link:border-secondary transition-colors shadow-sm">
+              <div className="w-8 h-8 bg-white rounded-lg p-1.5 border border-border group-hover/link:border-primary transition-colors shadow-sm">
                 <TeamLogo
                   src={team.crest}
                   alt={team.name}
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="font-bold text-slate-200 text-sm group-hover/link:text-secondary transition-colors truncate max-w-[100px] sm:max-w-none">
+              <span className="font-bold text-slate-900 text-sm group-hover/link:text-primary transition-colors truncate max-w-[100px] sm:max-w-none">
                 {team.shortName || team.name}
               </span>
             </Link>
 
             {liveMatch && (
-              <div className="flex items-center gap-2 ml-2 flex-shrink-0 bg-rose-500/10 px-2 py-1 rounded-lg border border-rose-500/20">
+              <div className="flex items-center gap-2 ml-2 flex-shrink-0 bg-rose-50 px-2 py-1 rounded-lg border border-rose-100">
                 <span className="flex h-1.5 w-1.5 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
                 </span>
-                <span className="text-[9px] font-black text-rose-500 uppercase tracking-tighter hidden xs:inline">LIVE</span>
-                <span className="text-[10px] font-black text-white">
+                <span className="text-[9px] font-black text-rose-600 uppercase tracking-tighter hidden xs:inline">LIVE</span>
+                <span className="text-[10px] font-black text-slate-900">
                   {liveMatch.score.fullTime.home} - {liveMatch.score.fullTime.away}
                 </span>
               </div>
             )}
           </div>
         </td>
-        <td className="px-4 py-4 text-center text-slate-400 text-xs font-bold">{stats.playedGames || stats.played}</td>
-        <td className="px-4 py-4 text-center text-emerald-500 font-black text-xs">{stats.won}</td>
-        <td className="px-4 py-4 text-center text-amber-500 font-black text-xs">{stats.draw}</td>
-        <td className="px-4 py-4 text-center text-rose-500 font-black text-xs">{stats.lost}</td>
+        <td className="px-4 py-4 text-center text-slate-600 text-xs font-bold">{stats.playedGames || stats.played}</td>
+        <td className="px-4 py-4 text-center text-emerald-600 font-black text-xs">{stats.won}</td>
+        <td className="px-4 py-4 text-center text-amber-600 font-black text-xs">{stats.draw}</td>
+        <td className="px-4 py-4 text-center text-rose-600 font-black text-xs">{stats.lost}</td>
         <td className="px-4 py-4 text-center">
-          <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-lg font-black text-xs">
+          <span className="bg-primary/5 text-primary px-3 py-1 rounded-lg font-black text-xs shadow-sm border border-primary/10">
             {stats.points}
           </span>
         </td>
@@ -112,22 +112,22 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
   return (
     <div className="space-y-12">
       {/* General Standings */}
-      <div className="overflow-hidden">
+      <div className="overflow-hidden bg-white border border-border rounded-2xl shadow-sm">
         <TableHeader title="General Standings" />
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full">
-            <thead className="bg-white/2">
+            <thead className="bg-slate-50/50">
               <tr>
-                <th className="px-6 py-3 text-left text-[10px] font-black text-muted uppercase tracking-widest">Pos</th>
-                <th className="px-6 py-3 text-left text-[10px] font-black text-muted uppercase tracking-widest">Team</th>
-                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">P</th>
-                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">W</th>
-                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">D</th>
-                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">L</th>
-                <th className="px-4 py-3 text-center text-[10px] font-black text-muted uppercase tracking-widest">Pts</th>
+                <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Pos</th>
+                <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Team</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">P</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">W</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">D</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">L</th>
+                <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Pts</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/30">
+            <tbody className="divide-y divide-border">
               {totalTable.map((team, idx) => (
                 <TableRow
                   key={team.team.id}
@@ -143,16 +143,16 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
 
       {/* Recent Results */}
       {recentMatches && recentMatches.length > 0 && (
-        <div className="pb-8">
+        <div className="pb-8 bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
           <TableHeader title="Recent Results" />
           <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {recentMatches.map((match) => (
-              <div key={match.id} className="bg-primary/50 border border-border/50 p-4 rounded-2xl hover:border-secondary transition-all group">
+              <div key={match.id} className="bg-slate-50/50 border border-border p-4 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all group">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-black text-muted uppercase tracking-tighter">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">
                     {new Date(match.utcDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </span>
-                  <span className="text-[9px] font-black text-secondary bg-secondary/10 px-2 py-0.5 rounded uppercase tracking-tighter">
+                  <span className="text-[9px] font-black text-primary bg-primary/5 px-2 py-0.5 rounded uppercase tracking-tighter border border-primary/10">
                     FT
                   </span>
                 </div>
@@ -161,15 +161,15 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
                     <div className="w-6 h-6 flex-shrink-0">
                       <TeamLogo src={match.homeTeam.crest} className="w-full h-full object-contain" />
                     </div>
-                    <span className="text-xs font-bold text-slate-200 truncate">{match.homeTeam.shortName || match.homeTeam.name}</span>
+                    <span className="text-xs font-bold text-slate-700 truncate">{match.homeTeam.shortName || match.homeTeam.name}</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-primary px-3 py-1 rounded-lg border border-border">
-                    <span className="text-sm font-black text-white">{match.score.fullTime.home}</span>
-                    <span className="text-xs font-bold text-muted">-</span>
-                    <span className="text-sm font-black text-white">{match.score.fullTime.away}</span>
+                  <div className="flex items-center gap-2 bg-white px-3 py-1 rounded-lg border border-border shadow-sm">
+                    <span className="text-sm font-black text-primary">{match.score.fullTime.home}</span>
+                    <span className="text-xs font-bold text-slate-400">-</span>
+                    <span className="text-sm font-black text-primary">{match.score.fullTime.away}</span>
                   </div>
                   <div className="flex-1 flex items-center justify-end gap-3 min-w-0">
-                    <span className="text-xs font-bold text-slate-200 truncate">{match.awayTeam.shortName || match.awayTeam.name}</span>
+                    <span className="text-xs font-bold text-slate-700 truncate">{match.awayTeam.shortName || match.awayTeam.name}</span>
                     <div className="w-6 h-6 flex-shrink-0">
                       <TeamLogo src={match.awayTeam.crest} className="w-full h-full object-contain" />
                     </div>

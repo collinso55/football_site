@@ -6,6 +6,7 @@ import PowerPotsTable from '../../../components/PowerPotsTable';
 import StatsTables from '../../../components/StatsTables';
 import LeagueLogo from '../../../components/LeagueLogo';
 import CountryFlag from '../../../components/CountryFlag';
+import BackButton from '../../../components/BackButton';
 
 export default async function LeaguePage({ params }) {
   const { id } = await params;
@@ -71,20 +72,21 @@ export default async function LeaguePage({ params }) {
         </div>
 
         <div className="container mx-auto px-6 mt-8">
+          <BackButton />
           {/* VERTICAL LAYOUT - ALL TABLES FULL WIDTH */}
           <div className="space-y-12">
             {/* Upcoming Fixtures Section - MOVED TO TOP */}
             <section>
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Upcoming Fixtures</h2>
-                <span className="text-[10px] font-black text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-widest">Next Games</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Upcoming Fixtures</h2>
+                <span className="text-[10px] font-black text-primary bg-primary/5 px-3 py-1 rounded-full uppercase tracking-widest border border-primary/10">Next Games</span>
               </div>
-              <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+              <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                 {upcomingMatches && upcomingMatches.length > 0 ? (
                   <FixturesList fixtures={upcomingMatches} title={null} />
                 ) : (
-                  <div className="p-12 text-center">
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No upcoming fixtures found</p>
+                  <div className="p-16 text-center">
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No upcoming fixtures found</p>
                   </div>
                 )}
               </div>
@@ -93,10 +95,10 @@ export default async function LeaguePage({ params }) {
             {/* Standings Section */}
             <section>
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">League Standings</h2>
-                <span className="text-[10px] font-black text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-widest">Live Updates</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">League Standings</h2>
+                <span className="text-[10px] font-black text-primary bg-primary/5 px-3 py-1 rounded-full uppercase tracking-widest border border-primary/10">Live Updates</span>
               </div>
-              <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+              <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                 {standings.length > 0 || (allMatches && allMatches.length > 0) ? (
                   <StandingsTable
                     standings={standingsData.standings || []}
@@ -105,9 +107,9 @@ export default async function LeaguePage({ params }) {
                     liveMatches={liveMatches}
                   />
                 ) : (
-                  <div className="p-12 text-center">
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">League hasn't started yet</p>
-                    <p className="text-xs text-slate-500 mt-2">Check back soon for live standings and results.</p>
+                  <div className="p-16 text-center">
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">League hasn't started yet</p>
+                    <p className="text-xs text-slate-500 mt-2 font-medium">Check back soon for live standings and results.</p>
                   </div>
                 )}
               </div>
@@ -117,9 +119,9 @@ export default async function LeaguePage({ params }) {
             {standings.length > 0 && (
               <section>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Power Analytics</h2>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Power Analytics</h2>
                 </div>
-                <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                   <PowerPotsTable standings={standings} leagueName={league.name} />
                 </div>
               </section>
@@ -129,9 +131,9 @@ export default async function LeaguePage({ params }) {
             {(standings.length > 0 || (allMatches && allMatches.length > 0)) && (
               <section>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white">Advanced Statistics</h2>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Advanced Statistics</h2>
                 </div>
-                <div className="bg-card rounded-3xl shadow-xl border border-border overflow-hidden premium-shadow">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-border overflow-hidden">
                   <StatsTables standings={standings} recentMatches={allMatches} />
                 </div>
               </section>
@@ -144,10 +146,10 @@ export default async function LeaguePage({ params }) {
     console.error('Error loading league data:', error);
     return (
       <div className="min-h-full p-8 bg-background">
-        <div className="max-w-2xl mx-auto bg-card rounded-3xl p-10 shadow-xl border border-rose-500/20 text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">Sync Error</h1>
-          <p className="text-slate-400 mb-8">{error.message}</p>
-          <button onClick={() => window.location.reload()} className="bg-secondary text-white px-8 py-3 rounded-xl font-bold">Retry Sync</button>
+        <div className="max-w-2xl mx-auto bg-white rounded-3xl p-10 shadow-xl border border-border text-center">
+          <h1 className="text-2xl font-black text-slate-900 mb-2">Sync Error</h1>
+          <p className="text-slate-500 mb-8 font-medium">{error.message}</p>
+          <button onClick={() => window.location.reload()} className="bg-primary text-white px-8 py-3 rounded-xl font-bold">Retry Sync</button>
         </div>
       </div>
     );
