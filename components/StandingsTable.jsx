@@ -114,12 +114,12 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
       {/* General Standings */}
       <div className="overflow-hidden bg-white border border-border rounded-2xl shadow-sm">
         <TableHeader title="General Standings" />
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full">
+        <div className="overflow-x-auto custom-scrollbar relative">
+          <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50">
               <tr>
-                <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Pos</th>
-                <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Team</th>
+                <th className="sticky left-0 z-20 bg-slate-50/50 px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[60px]">Pos</th>
+                <th className="sticky left-[60px] z-20 bg-slate-50/50 px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[180px]">Team</th>
                 <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">P</th>
                 <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">W</th>
                 <th className="px-4 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">D</th>
@@ -128,18 +128,64 @@ export default function StandingsTable({ standings, recentMatches, allMatches, l
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {totalTable.map((team, idx) => (
-                <TableRow
-                  key={team.team.id}
-                  team={team.team}
-                  stats={team}
-                  position={team.position || idx + 1}
-                />
-              ))}
+              {totalTable.map((team, idx) => {
+                const stats = team;
+                const position = team.position || idx + 1;
+                const liveMatch = liveMatches.find(m =>
+                  m.homeTeam.id === team.team.id || m.awayTeam.id === team.team.id
+                );
+
+                return (
+                  <tr key={team.team.id} className="border-b border-border hover:bg-slate-50 transition-colors group">
+                    <td className="sticky left-0 z-10 bg-white group-hover:bg-slate-50 px-6 py-4 font-black text-slate-500 text-xs">{position}</td>
+                    <td className="sticky left-[60px] z-10 bg-white group-hover:bg-slate-50 px-6 py-4">
+                      <div className="flex items-center justify-between">
+                        <Link
+                          href={`/teams/${team.team.id}`}
+                          className="flex items-center space-x-4 group/link"
+                        >
+                          <div className="w-8 h-8 bg-white rounded-lg p-1.5 border border-border group-hover/link:border-primary transition-colors shadow-sm flex-shrink-0">
+                            <TeamLogo
+                              src={team.team.crest}
+                              alt={team.team.name}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <span className="font-bold text-slate-900 text-sm group-hover/link:text-primary transition-colors truncate max-w-[120px]">
+                            {team.team.shortName || team.team.name}
+                          </span>
+                        </Link>
+
+                        {liveMatch && (
+                          <div className="flex items-center gap-2 ml-2 flex-shrink-0 bg-rose-50 px-2 py-1 rounded-lg border border-rose-100 scale-90 sm:scale-100">
+                            <span className="flex h-1.5 w-1.5 relative">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+                            </span>
+                            <span className="text-[10px] font-black text-slate-900">
+                              {liveMatch.score.fullTime.home}-{liveMatch.score.fullTime.away}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center text-slate-600 text-xs font-bold">{stats.playedGames || stats.played}</td>
+                    <td className="px-4 py-4 text-center text-emerald-600 font-black text-xs">{stats.won}</td>
+                    <td className="px-4 py-4 text-center text-amber-600 font-black text-xs">{stats.draw}</td>
+                    <td className="px-4 py-4 text-center text-rose-600 font-black text-xs">{stats.lost}</td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="bg-primary/5 text-primary px-3 py-1 rounded-lg font-black text-xs shadow-sm border border-primary/10">
+                        {stats.points}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
+
 
       {/* Recent Results */}
       {recentMatches && recentMatches.length > 0 && (

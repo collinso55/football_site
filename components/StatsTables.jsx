@@ -71,25 +71,25 @@ export default function StatsTables({ standings, recentMatches }) {
           </div>
         </div>
 
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full">
+        <div className="overflow-x-auto custom-scrollbar relative">
+          <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50 border-b border-border">
               <tr>
-                <th className="px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest">Team</th>
-                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Overall</th>
-                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Home</th>
-                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Away</th>
+                <th className="sticky left-0 z-20 bg-slate-50 px-8 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[200px]">Team</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[150px]">Overall</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[150px]">Home</th>
+                <th className="px-8 py-4 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[150px]">Away</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {teamsWithStats.map((team) => (
                 <tr key={team.team.id} className="hover:bg-slate-50 transition-colors group">
-                  <td className="px-8 py-5">
+                  <td className="sticky left-0 z-10 bg-white group-hover:bg-slate-50 px-8 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 bg-white rounded-lg p-1.5 border border-border group-hover:border-primary transition-colors shadow-sm">
+                      <div className="w-8 h-8 bg-white rounded-lg p-1.5 border border-border group-hover:border-primary transition-colors shadow-sm flex-shrink-0">
                         <TeamLogo src={team.team.crest} className="w-full h-full object-contain" />
                       </div>
-                      <span className="text-sm font-black text-slate-900 group-hover:text-primary transition-colors truncate max-w-[150px]">
+                      <span className="text-sm font-black text-slate-900 group-hover:text-primary transition-colors truncate max-w-[140px]">
                         {team.team.shortName || team.team.name}
                       </span>
                     </div>
@@ -117,6 +117,7 @@ export default function StatsTables({ standings, recentMatches }) {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   );
